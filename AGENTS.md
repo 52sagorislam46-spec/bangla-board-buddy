@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## App architecture
+
+- Keep the study experience in TanStack file routes, place study UI under `src/components/study`, and keep provider calls in `src/lib/*.functions.ts`; this preserves the existing runtime and keeps secret-backed work server-side.

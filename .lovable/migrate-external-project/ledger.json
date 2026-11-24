@@ -1,0 +1,103 @@
+{
+  "source": "https://github.com/52sagorislam46-spec/snap-to-study-companion.git@abb6d9cf4b850fe9824a3399d14ab88880170c9f",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "Public GitHub repository",
+      "outcome": "The existing TanStack Start study companion is now active at /, with Bengali study planning, suggestion-image scanning, answers, speech, PDF export, sharing, and installable-app support.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "schema",
+      "source": "drizzle/schema.ts",
+      "outcome": "The schema file is intentionally blank; no application tables or database provider are used by the study app.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "records",
+      "source": "Repository and inspection manifest",
+      "outcome": "No application database or record export was found.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "auth_identities",
+      "source": "Supabase integration scaffolding",
+      "outcome": "No login or user identity flow is used by the app; the source includes unused backend scaffolding only.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "authorization",
+      "source": "Application code",
+      "outcome": "No app roles, membership checks, or private user records were found.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "uploaded_file_bytes",
+      "source": "src/assets/sagor_profile.jpg.asset.json",
+      "outcome": "The creator portrait was retrieved from the source app, stored as a target-project asset, and loaded successfully in preview.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "external_providers",
+      "source": "src/lib/study.functions.ts",
+      "outcome": "Gemini, Groq, and Cartesia integrations are retained in server functions; live requests cannot be verified without their keys.",
+      "status": "pending",
+      "next_action": "Add the provider keys securely, then verify live AI and voice calls."
+    },
+    {
+      "capability": "public_endpoints",
+      "source": "Four unauthenticated TanStack server functions",
+      "outcome": "Image scanning, answer generation, no-image study generation, and speech remain unauthenticated same-origin app functions.",
+      "status": "pending",
+      "next_action": "Verify successful requests after the provider keys are added."
+    },
+    {
+      "capability": "callbacks",
+      "source": "Application routes",
+      "outcome": "No external callback routes were found.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "webhooks",
+      "source": "Application routes",
+      "outcome": "No webhook routes were found.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "schedules",
+      "source": "Application code and repository manifest",
+      "outcome": "No scheduled jobs or cron targets were found.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "secrets",
+      "source": "Server-function environment variable references",
+      "outcome": "The required names are GEMINI_API_KEY, GROQ_API_KEY, and CARTESIA_API_KEY; values were not present in the repository inspection.",
+      "status": "pending",
+      "next_action": "Request the three provider keys through the secure secret form before live provider verification."
+    },
+    {
+      "capability": "cutover",
+      "source": "src/lib/study.pdf.ts",
+      "outcome": "The share action points to the source project's published URL.",
+      "status": "verified",
+      "next_action": "None."
+    },
+    {
+      "capability": "verification",
+      "source": "Target preview",
+      "outcome": "The UI, creator image, image selection, missing-key response, mobile layout, and focused tests passed; successful provider calls remain unverified.",
+      "status": "pending",
+      "next_action": "Verify the preview UI and tests; live provider calls remain pending until keys are available."
+    }
+  ]
+}
