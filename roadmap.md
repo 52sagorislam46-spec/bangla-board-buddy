@@ -1,6 +1,10 @@
-# Import roadmap
+# পরীক্ষাসাথী কাজের তালিকা
 
-- [x] Clone and inspect the public source repository.
-- [x] Bring the existing study app code and required assets into this project.
-- [x] Verify the preview, mobile layout, and existing validation tests.
-- [ ] Verify live Gemini, Groq, and Cartesia calls after their keys are added securely.
+- [ ] বর্ণনামূলক উত্তরে ১০ নম্বর উপযোগী ভূমিকা, বিস্তারিত পয়েন্ট ও উপসংহার নিশ্চিত করা।
+- [ ] ছবির সব প্রশ্ন ধারাবাহিক ব্যাচে সমাধান ও দৃশ্যমান অগ্রগতি বজায় রাখা।
+- [ ] সংক্ষিপ্ত, মাঝারি, বর্ণনামূলক ও লিখিত প্রশ্নের উত্তর-ধরন আলাদা করা।
+- [ ] সাজেশন ছাড়া ১০০ নম্বরের মডেল টেস্ট তৈরি ও নম্বরের যোগফল যাচাই করা।
+- [ ] বিষয়-চাপলে সংশ্লিষ্ট প্রশ্ন ফিল্টার করা।
+- [ ] বাংলা অডিওতে চালু/থামানো ও পুনরায় শোনার নিয়ন্ত্রণ রাখা।
+- [ ] সব উত্তরসহ PDF সংরক্ষণ ও অ্যাপ-লিংক শেয়ার যাচাই করা।
+- [ ] সুরক্ষিত সেবা-চাবি পাওয়া গেলে Gemini, Groq ও Cartesia-র লাইভ সংযোগ যাচাই করা.
