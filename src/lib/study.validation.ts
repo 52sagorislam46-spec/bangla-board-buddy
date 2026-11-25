@@ -21,3 +21,12 @@ export function hasCompleteQuestionCoverage(expectedIds: string[], answerIds: st
   return expected.size === expectedIds.length && answered.size === answerIds.length &&
     expectedIds.every((id) => answered.has(id));
 }
+export function totalPaperMarks(questions: string[]): number {
+  const bn = "০১২৩৪৫৬৭৮৯";
+  return questions.reduce((sum, question) => {
+    const match = question.match(/\(([০-৯0-9.]+)\)\s*$/);
+    if (!match?.[1]) return sum;
+    const digits = [...match[1]].map((c) => (bn.includes(c) ? String(bn.indexOf(c)) : c)).join("");
+    return sum + (Number(digits) || 0);
+  }, 0);
+}

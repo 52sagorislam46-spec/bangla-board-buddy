@@ -5,6 +5,7 @@ import {
   createQuestionBatches,
   hasCompleteQuestionCoverage,
   isWithinSuggestionImageLimit,
+  totalPaperMarks,
 } from "./study.validation";
 
 describe("suggestion image limit", () => {
@@ -31,5 +32,13 @@ describe("complete suggestion answer batches", () => {
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1", "q2"])).toBe(true);
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1"])).toBe(false);
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1", "q1"])).toBe(false);
+  });
+});
+describe("100-mark model test", () => {
+  it("adds Bengali and English marks to exactly 100", () => {
+    expect(totalPaperMarks(["প্রশ্ন ১ (১০)", "প্রশ্ন ২ (৮০)", "Q3 (10)"])).toBe(100);
+  });
+  it("detects a paper that is not 100 marks", () => {
+    expect(totalPaperMarks(["প্রশ্ন (২)", "প্রশ্ন (৩)"])).toBe(5);
   });
 });

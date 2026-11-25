@@ -3,8 +3,8 @@ import type { StudyPack, QuestionKind } from "@/lib/study.types";
 const kindTitle: Record<QuestionKind, string> = {
   short: "সংক্ষিপ্ত প্রশ্ন (২ নম্বর)",
   medium: "মাঝারি প্রশ্ন",
-  long: "বর্ণনামূলক প্রশ্ন (৩ নম্বর)",
-  writing: "দরখাস্ত / পত্র / রচনা",
+  long: "বর্ণনামূলক প্রশ্ন (১০ নম্বর)",
+  writing: "লিখিত অংশ — দরখাস্ত / পত্র / রচনা / ভাবসম্প্রসারণ",
 };
 
 function esc(s: string) {
