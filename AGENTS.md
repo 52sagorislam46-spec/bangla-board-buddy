@@ -32,3 +32,4 @@ use the editor.
 ## App architecture
 
 - Keep the study experience in TanStack file routes, place study UI under `src/components/study`, and keep provider calls in `src/lib/*.functions.ts`; this preserves the existing runtime and keeps secret-backed work server-side.
+- Load AI Gateway model contracts through `src/ai-gateway.types.ts` and regenerate declarations with the Gateway CLI so inference calls remain type-checked.
