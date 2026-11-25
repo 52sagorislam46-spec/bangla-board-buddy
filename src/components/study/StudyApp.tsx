@@ -43,13 +43,14 @@ import type {
 } from "@/lib/study.types";
 import {
   ANSWER_BATCH_SIZE,
+  canPrepareSuggestionImage,
   createQuestionBatches,
+  getSuggestionImageMimeType,
   isWithinSuggestionImageLimit,
   MAX_SUGGESTION_IMAGES,
 } from "@/lib/study.validation";
 
 const IMAGE_LIMIT_BYTES = 360_000;
-const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
 type SelectedImage = {
   id: string;
@@ -115,10 +116,16 @@ function makeJpeg(blob: Blob, width: number, height: number, quality: number): P
 
 async function prepareImage(file: File): Promise<SuggestionImage> {
   let uploadBlob: Blob = file;
-  let mimeType: SuggestionImage["mimeType"] = file.type as SuggestionImage["mimeType"];
+  const detectedMimeType = getSuggestionImageMimeType(file.name, file.type);
+  let mimeType: SuggestionImage["mimeType"] = detectedMimeType ?? "image/jpeg";
 
-  if (file.size > IMAGE_LIMIT_BYTES) {
-    const bitmap = await createImageBitmap(file);
+  if (file.size > IMAGE_LIMIT_BYTES || detectedMimeType === null) {
+    let bitmap: ImageBitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      throw new Error("এই ছবিটি খোলা যাচ্ছে না। JPG বা PNG ছবি বেছে আবার চেষ্টা করুন।");
+    }
     const ratio = Math.min(1, 1_500 / Math.max(bitmap.width, bitmap.height));
     let scale = ratio;
     let quality = 0.82;
@@ -272,9 +279,9 @@ export function StudyApp() {
     input.value = "";
     if (incoming.length === 0) return;
 
-    const accepted = incoming.filter((file) => acceptedImageTypes.includes(file.type));
-    if (accepted.length !== incoming.length) {
-      setErrorMessage("JPG, PNG বা WebP ছবিই দেওয়া যাবে।");
+    const accepted = incoming.filter((file) => canPrepareSuggestionImage(file.name, file.type));
+    if (accepted.length === 0) {
+      setErrorMessage("ছবির ফাইল বেছে নিন। PDF বা অন্য নথি আপলোড করা যাবে না।");
       return;
     }
 
@@ -282,6 +289,8 @@ export function StudyApp() {
     const additions = accepted.slice(0, Math.max(0, available));
     if (!isWithinSuggestionImageLimit(selectedImages.length + accepted.length)) {
       setErrorMessage(`একসাথে সর্বোচ্চ ${MAX_SUGGESTION_IMAGES.toLocaleString("bn-BD")}টি ছবি দেওয়া যাবে।`);
+    } else if (accepted.length !== incoming.length) {
+      setErrorMessage("কিছু ফাইল ছবি ছিল না, সেগুলো বাদ দেওয়া হয়েছে।");
     } else {
       setErrorMessage("");
     }
@@ -483,6 +492,9 @@ export function StudyApp() {
       }
     } catch (error) {
       setErrorMessage(friendlyError(error));
+      setProgress((current) => current.total > 0
+        ? { ...current, label: "এখানে প্রক্রিয়াটি থেমেছে; আবার চাপলে বাকি অংশ চলবে" }
+        : { label: "", completed: 0, total: 0 });
     } finally {
       setBusy(false);
     }
@@ -568,7 +580,10 @@ export function StudyApp() {
               </CardHeader>
               <CardContent className="px-5 py-5">
                 <form onSubmit={handleGenerate} className="space-y-5">
-                  <Tabs value={mode} onValueChange={(value) => setMode(value === "no-images" ? "no-images" : "images")}>
+                  <Tabs value={mode} onValueChange={(value) => {
+                    setMode(value === "no-images" ? "no-images" : "images");
+                    setErrorMessage("");
+                  }}>
                     <TabsList className="grid h-auto w-full grid-cols-2 rounded-md bg-muted p-1">
                       <TabsTrigger value="images" className="min-h-10 gap-2 rounded-sm px-2 text-xs sm:text-sm">
                         <ImagePlus className="size-4" aria-hidden="true" /> ছবি আছে
@@ -591,10 +606,12 @@ export function StudyApp() {
 
                       <input
                         ref={fileInputRef}
+                        id="suggestion-image-input"
                         type="file"
-                        accept="image/jpeg,image/png,image/webp"
+                        accept="image/*"
                         multiple
                         className="sr-only"
+                        disabled={selectedImages.length >= MAX_SUGGESTION_IMAGES}
                         aria-label="সাজেশনের ছবি বেছে নিন"
                         onChange={addImages}
                       />
@@ -604,17 +621,19 @@ export function StudyApp() {
                         </div>
                         <p className="mt-3 text-sm font-semibold">একসাথে একাধিক ছবি বেছে নিন</p>
                         <p className="mt-1 text-xs text-muted-foreground">সর্বোচ্চ ২০টি</p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="mt-3"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={selectedImages.length >= MAX_SUGGESTION_IMAGES}
-                        >
-                          <ImagePlus aria-hidden="true" />
-                          ছবি বাছুন
-                        </Button>
+                        {selectedImages.length >= MAX_SUGGESTION_IMAGES ? (
+                          <Button type="button" variant="outline" size="sm" className="mt-3" disabled>
+                            <ImagePlus aria-hidden="true" />
+                            ছবি বাছুন
+                          </Button>
+                        ) : (
+                          <Button asChild type="button" variant="outline" size="sm" className="mt-3">
+                            <label htmlFor="suggestion-image-input">
+                              <ImagePlus aria-hidden="true" />
+                              ছবি বাছুন
+                            </label>
+                          </Button>
+                        )}
                       </div>
 
                       {selectedImages.length > 0 ? (

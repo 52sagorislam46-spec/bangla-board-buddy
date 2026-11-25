@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   ANSWER_BATCH_SIZE,
+  canPrepareSuggestionImage,
   createQuestionBatches,
+  getSuggestionImageMimeType,
   hasCompleteQuestionCoverage,
   isWithinSuggestionImageLimit,
+  normalizeModelTestMarks,
   totalPaperMarks,
 } from "./study.validation";
 
@@ -40,5 +43,48 @@ describe("100-mark model test", () => {
   });
   it("detects a paper that is not 100 marks", () => {
     expect(totalPaperMarks(["প্রশ্ন (২)", "প্রশ্ন (৩)"])).toBe(5);
+  });
+
+  it("corrects a generated 104-mark paper without dropping questions", () => {
+    const paper = {
+      short: [{ question: "প্রশ্ন ১ (২)" }, { question: "প্রশ্ন ২ (২)" }],
+      medium: [{ question: "প্রশ্ন ৩ (৫)" }, { question: "প্রশ্ন ৪ (৫)" }],
+      long: [{ question: "প্রশ্ন ৫ (১০)" }, { question: "প্রশ্ন ৬ (৮০)" }],
+      writing: [],
+    };
+    const normalized = normalizeModelTestMarks(paper);
+    const allQuestions = Object.values(normalized).flat();
+
+    expect(totalPaperMarks(allQuestions.map((item) => item.question))).toBe(100);
+    expect(allQuestions).toHaveLength(6);
+    expect(allQuestions.every((item) => totalPaperMarks([item.question]) > 0)).toBe(true);
+  });
+
+  it("assigns marks when a provider omits the mark labels", () => {
+    const paper = {
+      short: [{ question: "সংক্ষিপ্ত প্রশ্ন" }],
+      medium: [{ question: "মাঝারি প্রশ্ন" }],
+      long: [{ question: "বর্ণনামূলক প্রশ্ন" }],
+      writing: [],
+    };
+    const normalized = normalizeModelTestMarks(paper);
+
+    expect(totalPaperMarks(Object.values(normalized).flat().map((item) => item.question))).toBe(100);
+  });
+});
+
+describe("mobile suggestion image formats", () => {
+  it("accepts images with a known extension even when the phone omits MIME type", () => {
+    expect(canPrepareSuggestionImage("page.jpg", "")).toBe(true);
+    expect(getSuggestionImageMimeType("page.jpg", "")).toBe("image/jpeg");
+  });
+
+  it("allows browser-decodable image formats for JPEG conversion", () => {
+    expect(canPrepareSuggestionImage("page.heic", "image/heic")).toBe(true);
+    expect(getSuggestionImageMimeType("page.heic", "image/heic")).toBeNull();
+  });
+
+  it("rejects files that are not images", () => {
+    expect(canPrepareSuggestionImage("notes.pdf", "application/pdf")).toBe(false);
   });
 });
