@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ANSWER_BATCH_SIZE,
+  alignAnswersByQuestion,
   canPrepareSuggestionImage,
   createQuestionBatches,
   getSuggestionImageMimeType,
@@ -35,6 +36,30 @@ describe("complete suggestion answer batches", () => {
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1", "q2"])).toBe(true);
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1"])).toBe(false);
     expect(hasCompleteQuestionCoverage(["q1", "q2"], ["q1", "q1"])).toBe(false);
+  });
+
+  it("aligns answers by ID even when the provider changes their order", () => {
+    const questions = [{ id: "q1", question: "প্রথম" }, { id: "q2", question: "দ্বিতীয়" }];
+    const answers = [{ id: "q2", answer: "দ্বিতীয় উত্তর" }, { id: "q1", answer: "প্রথম উত্তর" }];
+
+    expect(alignAnswersByQuestion(questions, answers)?.map(({ answer }) => answer.answer)).toEqual([
+      "প্রথম উত্তর",
+      "দ্বিতীয় উত্তর",
+    ]);
+  });
+
+  it("falls back to input order when the provider changes IDs but returns every answer", () => {
+    const questions = [{ id: "q1", question: "প্রথম" }, { id: "q2", question: "দ্বিতীয়" }];
+    const answers = [{ id: "changed-1", answer: "প্রথম উত্তর" }, { id: "changed-2", answer: "দ্বিতীয় উত্তর" }];
+
+    expect(alignAnswersByQuestion(questions, answers)?.map(({ question, answer }) => [question.id, answer.answer])).toEqual([
+      ["q1", "প্রথম উত্তর"],
+      ["q2", "দ্বিতীয় উত্তর"],
+    ]);
+  });
+
+  it("does not align answers when the provider omitted an answer", () => {
+    expect(alignAnswersByQuestion([{ id: "q1" }, { id: "q2" }], [{ id: "q1" }])).toBeNull();
   });
 });
 describe("100-mark model test", () => {

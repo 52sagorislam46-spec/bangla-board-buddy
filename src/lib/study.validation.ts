@@ -43,6 +43,37 @@ export function hasCompleteQuestionCoverage(expectedIds: string[], answerIds: st
   return expected.size === expectedIds.length && answered.size === answerIds.length &&
     expectedIds.every((id) => answered.has(id));
 }
+
+export function alignAnswersByQuestion<T extends { id: string }, A extends { id: string }>(
+  questions: T[],
+  answers: A[],
+): Array<{ question: T; answer: A }> | null {
+  if (questions.length !== answers.length) return null;
+
+  const questionIds = questions.map((question) => question.id);
+  const answerIds = answers.map((answer) => answer.id);
+  const aligned: Array<{ question: T; answer: A }> = [];
+
+  if (hasCompleteQuestionCoverage(questionIds, answerIds)) {
+    const answersById = new Map(answers.map((answer) => [answer.id, answer]));
+    for (const question of questions) {
+      const answer = answersById.get(question.id);
+      if (!answer) return null;
+      aligned.push({ question, answer });
+    }
+    return aligned;
+  }
+
+  // The prompt asks the model to preserve input order; use that order if IDs were altered.
+  for (let index = 0; index < questions.length; index += 1) {
+    const question = questions[index];
+    const answer = answers[index];
+    if (!question || !answer) return null;
+    aligned.push({ question, answer });
+  }
+  return aligned;
+}
+
 export function totalPaperMarks(questions: string[]): number {
   return questions.reduce((sum, question) => {
     const match = question.match(/[（(]\s*([০-৯0-9]+)\s*[）)]\s*$/u);
