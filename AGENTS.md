@@ -33,3 +33,4 @@ use the editor.
 
 - Keep the study experience in TanStack file routes, place study UI under `src/components/study`, and keep provider calls in `src/lib/*.functions.ts`; this preserves the existing runtime and keeps secret-backed work server-side.
 - Load AI Gateway model contracts through `src/ai-gateway.types.ts` and regenerate declarations with the Gateway CLI so inference calls remain type-checked.
+- Use Nitro's Vercel preset only when `VERCEL=1`, retaining the existing Cloudflare default elsewhere so Vercel server functions run on their native host without changing Lovable previews.
